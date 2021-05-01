@@ -36,45 +36,34 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public Mono<Recipe> findById(String id) {
-
-//        Recipe recipe = recipeReactiveRepository.findById(id).block();
-//
-//        if (recipe == null) {
-//            throw new NotFoundException("Recipe Not Found. For ID value: " + id );
-//        }
-//
-//        return Mono.just(recipe);
         return recipeReactiveRepository.findById(id);
     }
 
     @Override
     public Mono<RecipeCommand> findCommandById(String id) {
 
-        RecipeCommand recipeCommand = recipeToRecipeCommand.convert(findById(id).block());
+        return recipeReactiveRepository.findById(id)
+            .map(recipe -> {
+                RecipeCommand recipeCommand = recipeToRecipeCommand.convert(recipe);
 
-        //enhance command object with id value
-        if(recipeCommand.getIngredients() != null && recipeCommand.getIngredients().size() > 0){
-            recipeCommand.getIngredients().forEach(rc -> {
-                rc.setRecipeId(recipeCommand.getId());
+                recipeCommand.getIngredients().forEach(rc -> {
+                    rc.setRecipeId(recipeCommand.getId());
+                });
+
+                return recipeCommand;
             });
-        }
-
-        return Mono.just(recipeCommand);
     }
 
     @Override
     public Mono<RecipeCommand> saveRecipeCommand(RecipeCommand command) {
-        Recipe detachedRecipe = recipeCommandToRecipe.convert(command);
-
-        Recipe savedRecipe = recipeReactiveRepository.save(detachedRecipe).block();
-        log.debug("Saved RecipeId:" + savedRecipe.getId());
-        return Mono.just(recipeToRecipeCommand.convert(savedRecipe));
+        return recipeReactiveRepository.save(recipeCommandToRecipe.convert(command))
+            .map(recipeToRecipeCommand::convert);
     }
 
     @Override
     public Mono<Void> deleteById(String idToDelete) {
 
-        recipeReactiveRepository.deleteById(idToDelete);
+        recipeReactiveRepository.deleteById(idToDelete).block();
         return Mono.empty();
     }
 }
