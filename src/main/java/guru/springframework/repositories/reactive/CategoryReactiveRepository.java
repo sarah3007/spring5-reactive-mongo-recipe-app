@@ -4,8 +4,6 @@ import guru.springframework.domain.Category;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
-
 /**
  * Created by jt on 8/17/17.
  */

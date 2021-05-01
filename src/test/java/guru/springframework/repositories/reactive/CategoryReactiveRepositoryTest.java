@@ -40,6 +40,7 @@ public class CategoryReactiveRepositoryTest {
     Category category = new Category();
     category.setDescription("Foo");
 
+    // do I really need .then?
     categoryReactiveRepository.save(category).then().block();
 
     Category fetchedCat = categoryReactiveRepository.findByDescription("Foo").block();
