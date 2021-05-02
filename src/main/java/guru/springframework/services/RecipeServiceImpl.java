@@ -30,7 +30,6 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public Flux<Recipe> getRecipes() {
         log.debug("I'm in the service");
-
         return recipeReactiveRepository.findAll();
     }
 
@@ -55,15 +54,16 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    public Mono<RecipeCommand> saveRecipeCommand(RecipeCommand command) {
+    public Mono<RecipeCommand>  saveRecipeCommand(RecipeCommand command) {
+
         return recipeReactiveRepository.save(recipeCommandToRecipe.convert(command))
             .map(recipeToRecipeCommand::convert);
     }
 
     @Override
     public Mono<Void> deleteById(String idToDelete) {
-
         recipeReactiveRepository.deleteById(idToDelete).block();
+
         return Mono.empty();
     }
 }
