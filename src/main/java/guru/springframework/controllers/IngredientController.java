@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import reactor.core.publisher.Flux;
 
 /**
  * Created by jt on 6/28/17.
@@ -72,8 +73,6 @@ public class IngredientController {
         //init uom
         ingredientCommand.setUom(new UnitOfMeasureCommand());
 
-        model.addAttribute("uomList",  unitOfMeasureService.listAllUoms());
-
         return "recipe/ingredient/ingredientform";
     }
 
@@ -82,7 +81,6 @@ public class IngredientController {
                                          @PathVariable String id, Model model){
         model.addAttribute("ingredient", ingredientService.findByRecipeIdAndIngredientId(recipeId, id).block());
 
-        model.addAttribute("uomList", unitOfMeasureService.listAllUoms());
         return "recipe/ingredient/ingredientform";
     }
 
@@ -119,4 +117,9 @@ public class IngredientController {
         return "redirect:/recipe/" + recipeId + "/ingredients";
     }
 
+    // with every request, the model below will be loaded
+    @ModelAttribute("uomList")
+    public Flux<UnitOfMeasureCommand> populateUomList(){
+        return unitOfMeasureService.listAllUoms();
+    }
 }
